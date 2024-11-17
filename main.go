@@ -91,6 +91,8 @@ func main() {
 		planetsList[i].ResidentsCount = len(planetsList[i].Residents)
 	}
 
+	topThree := utils.ReturnTopThree(planetsList)
+
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
 		dbUser, dbPassword, dbName, dbHost, dbPort)
 
@@ -115,14 +117,13 @@ func main() {
 		}()
 
 		truncateQuery := fmt.Sprintf("TRUNCATE %s", insertTable)
-		fmt.Println(truncateQuery)
 		_, err = tx.Exec(truncateQuery)
 
 		if err != nil {
 			return err
 		}
 
-		for _, value := range planetsList {
+		for _, value := range topThree {
 			// Выполняем вставку
 			query := fmt.Sprintf("INSERT INTO %s (id, name, type, dimension, resident_cnt) VALUES ($1, $2, $3, $4, $5)", insertTable)
 			_, err = tx.Exec(query, value.ID, value.Name, value.Type, value.Dimension, value.ResidentsCount)
